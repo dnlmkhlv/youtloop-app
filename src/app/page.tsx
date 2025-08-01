@@ -93,14 +93,34 @@ export default function Home() {
       }
     };
 
+    const handleTouchMove = (event: TouchEvent) => {
+      if (isDragging && dragType) {
+        event.preventDefault();
+        const touch = event.touches[0];
+        handleDrag({ clientX: touch.clientX } as any);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (isDragging) {
+        handleDragEnd();
+      }
+    };
+
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
+      document.addEventListener("touchend", handleTouchEnd);
     }
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
   }, [isDragging, dragType, loopEnd, duration, loopStart]);
 
@@ -152,13 +172,16 @@ export default function Home() {
     }
   };
 
-  const handleDragStart = (event: React.MouseEvent, type: "start" | "end") => {
+  const handleDragStart = (
+    event: React.MouseEvent | React.TouchEvent,
+    type: "start" | "end"
+  ) => {
     event.stopPropagation();
     setIsDragging(true);
     setDragType(type);
   };
 
-  const handleDrag = (event: React.MouseEvent) => {
+  const handleDrag = (event: React.MouseEvent | { clientX: number }) => {
     if (!isDragging || !dragType || !customTimelineRef.current || !duration)
       return;
 
@@ -614,11 +637,12 @@ export default function Home() {
 
                 {/* Start Handle */}
                 <div
-                  className={`absolute top-0 w-3 h-full cursor-ew-resize ${
+                  className={`absolute top-0 w-3 h-full cursor-ew-resize touch-none ${
                     isDragging && dragType === "start" ? "z-20" : "z-10"
                   }`}
                   style={{ left: `${(loopStart / duration) * 100}%` }}
                   onMouseDown={(e) => handleDragStart(e, "start")}
+                  onTouchStart={(e) => handleDragStart(e, "start")}
                 >
                   <div className="w-3 h-3 bg-white rounded-sm shadow-lg transform -translate-x-1/2 translate-y-1/2" />
                   <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-white font-mono">
@@ -628,11 +652,12 @@ export default function Home() {
 
                 {/* End Handle */}
                 <div
-                  className={`absolute top-0 w-3 h-full cursor-ew-resize ${
+                  className={`absolute top-0 w-3 h-full cursor-ew-resize touch-none ${
                     isDragging && dragType === "end" ? "z-20" : "z-10"
                   }`}
                   style={{ left: `${(loopEnd / duration) * 100}%` }}
                   onMouseDown={(e) => handleDragStart(e, "end")}
+                  onTouchStart={(e) => handleDragStart(e, "end")}
                 >
                   <div className="w-3 h-3 bg-white rounded-sm shadow-lg transform -translate-x-1/2 translate-y-1/2" />
                   <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-white font-mono">
