@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   keywords: "YouTube, video loop, AB loop, learning, practice, video player",
   authors: [{ name: "YouTLoop" }],
   viewport: "width=device-width, initial-scale=1",
-  metadataBase: new URL("https://youtloop.app"),
+  metadataBase: new URL("https://youtloop.vercel.app"),
   openGraph: {
     title: "YouTLoop - Loop YouTube Videos with Precision",
     description:
@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/android-chrome-512x512.png",
-        width: 512,
-        height: 512,
-        alt: "YouTLoop Logo",
+        url: "/youtloop-og.png",
+        width: 1200,
+        height: 630,
+        alt: "YouTLoop - Loop YouTube Videos with Precision",
       },
     ],
   },
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     title: "YouTLoop - Loop YouTube Videos with Precision",
     description:
       "Loop any YouTube video with AB loop functionality. Perfect for learning languages, sports, music, and more.",
-    images: ["/android-chrome-512x512.png"],
+    images: ["/youtloop-og.png"],
   },
   icons: {
     icon: [
