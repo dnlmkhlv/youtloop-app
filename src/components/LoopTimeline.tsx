@@ -78,30 +78,30 @@ export default function LoopTimeline({
 
         {/* Start Handle */}
         <div
-          className={`absolute top-0 w-3 h-full cursor-ew-resize touch-none ${
+          className={`absolute top-0 w-4 h-full cursor-ew-resize touch-none ${
             isDragging && dragType === "start" ? "z-20" : "z-10"
           }`}
           style={{ left: `${(loopStart / duration) * 100}%` }}
           onMouseDown={(e) => handleDragStart(e, "start")}
           onTouchStart={(e) => handleDragStart(e, "start")}
         >
-          <div className="w-3 h-3 bg-white rounded-sm shadow-lg transform -translate-x-1/2 translate-y-1/2" />
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-white font-mono">
+          <div className="w-4 h-6 bg-red-500 rounded-sm shadow-lg transform -translate-x-1/2 translate-y-1/2 border-2 border-white" />
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-white font-mono bg-black/70 px-1 rounded">
             {formatTime(loopStart)}
           </div>
         </div>
 
         {/* End Handle */}
         <div
-          className={`absolute top-0 w-3 h-full cursor-ew-resize touch-none ${
+          className={`absolute top-0 w-4 h-full cursor-ew-resize touch-none ${
             isDragging && dragType === "end" ? "z-20" : "z-10"
           }`}
           style={{ left: `${(loopEnd / duration) * 100}%` }}
           onMouseDown={(e) => handleDragStart(e, "end")}
           onTouchStart={(e) => handleDragStart(e, "end")}
         >
-          <div className="w-3 h-3 bg-white rounded-sm shadow-lg transform -translate-x-1/2 translate-y-1/2" />
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-white font-mono">
+          <div className="w-4 h-6 bg-red-500 rounded-sm shadow-lg transform -translate-x-1/2 translate-y-1/2 border-2 border-white" />
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-white font-mono bg-black/70 px-1 rounded">
             {formatTime(loopEnd)}
           </div>
         </div>

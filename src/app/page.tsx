@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
 import VideoPlayer from "@/components/VideoPlayer";
 import LoopTimeline from "@/components/LoopTimeline";
@@ -24,7 +24,7 @@ export default function Home() {
     playbackRate,
     playerRef,
     onReady,
-    onStateChange,
+    onStateChange: originalStateChange,
     onProgress,
     setVolume,
     setIsMuted,
@@ -71,29 +71,75 @@ export default function Home() {
   const [dragType, setDragType] = useState<"start" | "end" | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Handle YouTube player state changes
+  const onStateChange = useCallback(
+    (event: any) => {
+      const state = event.target.getPlayerState();
+
+      // If video ended (state === 0) and looping is enabled, restart from loop start
+      if (state === 0 && isLooping) {
+        event.target.seekTo(loopStart, true);
+        event.target.playVideo();
+      }
+
+      // Call original state change handler
+      originalStateChange(event);
+    },
+    [isLooping, loopStart, originalStateChange]
+  );
+
   // Refs
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const customTimelineRef = useRef<HTMLDivElement>(null);
+  const saveTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  // Debounced save function
+  const debouncedSave = useCallback(
+    (dataToSave: typeof savedData) => {
+      if (saveTimeout.current) {
+        clearTimeout(saveTimeout.current);
+      }
+      saveTimeout.current = setTimeout(() => {
+        setSavedData(dataToSave);
+      }, 500); // Wait 500ms after the last change before saving
+    },
+    [setSavedData]
+  );
 
   // Theme toggle function
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Load saved data when localStorage becomes available
+  // Load saved data only once when localStorage becomes available
   useEffect(() => {
     if (isDataLoaded && savedData) {
-      if (savedData.videoUrl) setVideoUrl(savedData.videoUrl);
-      if (savedData.videoId) setVideoId(savedData.videoId);
-      if (savedData.loopStart !== undefined) setLoopStart(savedData.loopStart);
-      if (savedData.loopEnd !== undefined) setLoopEnd(savedData.loopEnd);
-      if (savedData.isLooping !== undefined) setIsLooping(savedData.isLooping);
-      if (savedData.isDarkMode !== undefined)
-        setIsDarkMode(savedData.isDarkMode);
+      const {
+        videoUrl,
+        videoId,
+        loopStart,
+        loopEnd,
+        isLooping,
+        isDarkMode,
+        playbackRate: savedPlaybackRate,
+        volume: savedVolume,
+        isMuted: savedIsMuted,
+      } = savedData;
+
+      // Set initial values from saved data
+      if (videoUrl) setVideoUrl(videoUrl);
+      if (videoId) setVideoId(videoId);
+      if (loopStart !== undefined) setLoopStart(loopStart);
+      if (loopEnd !== undefined) setLoopEnd(loopEnd);
+      if (isLooping !== undefined) setIsLooping(isLooping);
+      if (isDarkMode !== undefined) setIsDarkMode(isDarkMode);
+      if (savedPlaybackRate !== undefined) setPlaybackRate(savedPlaybackRate);
+      if (savedVolume !== undefined) setVolume(savedVolume);
+      if (savedIsMuted !== undefined) setIsMuted(savedIsMuted);
     }
-  }, [isDataLoaded, savedData]);
+  }, [isDataLoaded]); // Only run when isDataLoaded changes
 
   // Apply theme to document
   useEffect(() => {
@@ -106,6 +152,9 @@ export default function Home() {
 
   // Save data when important states change
   useEffect(() => {
+    // Don't save until localStorage is loaded to prevent overwriting saved data
+    if (!isDataLoaded) return;
+
     const dataToSave = {
       videoUrl,
       videoId,
@@ -120,8 +169,15 @@ export default function Home() {
 
     // Only save if data has actually changed
     if (JSON.stringify(dataToSave) !== JSON.stringify(savedData)) {
-      setSavedData(dataToSave);
+      debouncedSave(dataToSave);
     }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (saveTimeout.current) {
+        clearTimeout(saveTimeout.current);
+      }
+    };
   }, [
     videoUrl,
     videoId,
@@ -133,7 +189,8 @@ export default function Home() {
     isMuted,
     isDarkMode,
     savedData,
-    setSavedData,
+    debouncedSave,
+    isDataLoaded,
   ]);
 
   // Handle clicking outside search bar to remove focus
@@ -153,34 +210,67 @@ export default function Home() {
     };
   }, []);
 
-  // Handle custom timeline dragging
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      if (isDragging && dragType) {
-        handleDrag(event as any);
-      }
-    };
+  // Memoized drag handlers to prevent recreation on every render
+  const handleMouseMove = useCallback(
+    (event: MouseEvent) => {
+      if (isDragging && dragType && customTimelineRef.current && duration) {
+        const rect = customTimelineRef.current.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+        const newTime = Math.max(0, Math.min(duration, percentage * duration));
 
-    const handleMouseUp = () => {
-      if (isDragging) {
-        handleDragEnd();
+        if (dragType === "start") {
+          // Ensure start doesn't go beyond end - 1 second
+          setLoopStart(Math.min(newTime, loopEnd - 1));
+        } else {
+          // Ensure end doesn't go before start + 1 second
+          setLoopEnd(Math.max(newTime, loopStart + 1));
+        }
+        setIsLooping(true);
       }
-    };
+    },
+    [isDragging, dragType, duration, loopStart, loopEnd]
+  );
 
-    const handleTouchMove = (event: TouchEvent) => {
-      if (isDragging && dragType) {
+  const handleMouseUp = useCallback(() => {
+    if (isDragging) {
+      setIsDragging(false);
+      setDragType(null);
+    }
+  }, [isDragging]);
+
+  const handleTouchMove = useCallback(
+    (event: TouchEvent) => {
+      if (isDragging && dragType && customTimelineRef.current && duration) {
         event.preventDefault();
         const touch = event.touches[0];
-        handleDrag({ clientX: touch.clientX } as any);
-      }
-    };
+        const rect = customTimelineRef.current.getBoundingClientRect();
+        const clickX = touch.clientX - rect.left;
+        const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+        const newTime = Math.max(0, Math.min(duration, percentage * duration));
 
-    const handleTouchEnd = () => {
-      if (isDragging) {
-        handleDragEnd();
+        if (dragType === "start") {
+          // Ensure start doesn't go beyond end - 1 second
+          setLoopStart(Math.min(newTime, loopEnd - 1));
+        } else {
+          // Ensure end doesn't go before start + 1 second
+          setLoopEnd(Math.max(newTime, loopStart + 1));
+        }
+        setIsLooping(true);
       }
-    };
+    },
+    [isDragging, dragType, duration, loopStart, loopEnd]
+  );
 
+  const handleTouchEnd = useCallback(() => {
+    if (isDragging) {
+      setIsDragging(false);
+      setDragType(null);
+    }
+  }, [isDragging]);
+
+  // Handle custom timeline dragging
+  useEffect(() => {
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
@@ -196,7 +286,13 @@ export default function Home() {
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [isDragging, dragType, loopEnd, duration, loopStart]);
+  }, [
+    isDragging,
+    handleMouseMove,
+    handleMouseUp,
+    handleTouchMove,
+    handleTouchEnd,
+  ]);
 
   // Extract YouTube video ID from URL
 
@@ -247,31 +343,6 @@ export default function Home() {
     event.stopPropagation();
     setIsDragging(true);
     setDragType(type);
-  };
-
-  const handleDrag = (event: React.MouseEvent | { clientX: number }) => {
-    if (!isDragging || !dragType || !customTimelineRef.current || !duration)
-      return;
-
-    const rect = customTimelineRef.current.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, clickX / rect.width));
-    const newTime = percentage * duration;
-
-    if (dragType === "start") {
-      setLoopStart(newTime);
-      if (loopEnd <= newTime) {
-        setLoopEnd(Math.min(duration, newTime + 30));
-      }
-    } else {
-      setLoopEnd(newTime);
-    }
-    setIsLooping(true);
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-    setDragType(null);
   };
 
   // Keyboard shortcuts
@@ -341,6 +412,26 @@ export default function Home() {
       }
     }
   }, [volume, isMuted]);
+
+  // Handle video looping
+  useEffect(() => {
+    if (!isLooping || !playerRef.current || !duration) return;
+
+    const checkAndLoop = () => {
+      const currentTime = playerRef.current.getCurrentTime();
+      if (currentTime >= loopEnd) {
+        playerRef.current.seekTo(loopStart, true);
+        playerRef.current.playVideo();
+      }
+    };
+
+    // Check more frequently for more precise looping
+    const loopInterval = setInterval(checkAndLoop, 50);
+
+    return () => {
+      clearInterval(loopInterval);
+    };
+  }, [isLooping, loopStart, loopEnd, duration]);
 
   const toggleFullscreen = () => {
     if (!videoContainerRef.current) return;
