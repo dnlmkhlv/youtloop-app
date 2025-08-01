@@ -603,8 +603,9 @@ export default function Home() {
                   Loop Controls
                 </h3>
 
-                <div className="flex items-center gap-4">
-                  <div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Loop Status */}
+                  <div className="lg:col-span-1">
                     <h4
                       className={`font-medium mb-3 ${
                         isDarkMode ? "text-gray-200" : "text-[#606060]"
@@ -612,10 +613,10 @@ export default function Home() {
                     >
                       Loop Status
                     </h4>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-3">
                       <button
                         onClick={() => setIsLooping(!isLooping)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 w-fit ${
                           isLooping
                             ? "bg-red-600 hover:bg-red-700 text-white"
                             : isDarkMode
@@ -626,7 +627,7 @@ export default function Home() {
                         {isLooping ? "Disable Loop" : "Enable Loop"}
                       </button>
                       {isLooping && (
-                        <span className="text-sm text-red-400">
+                        <span className="text-sm text-red-400 font-medium">
                           Looping: {formatTime(loopStart)} -{" "}
                           {formatTime(loopEnd)}
                         </span>
@@ -635,7 +636,7 @@ export default function Home() {
                   </div>
 
                   {/* Keyboard Shortcuts */}
-                  <div>
+                  <div className="lg:col-span-2">
                     <h4
                       className={`font-medium mb-3 ${
                         isDarkMode ? "text-gray-200" : "text-[#606060]"
@@ -643,114 +644,118 @@ export default function Home() {
                     >
                       Keyboard Shortcuts
                     </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span
-                          className={
-                            isDarkMode ? "text-gray-300" : "text-[#606060]"
-                          }
-                        >
-                          Play/Pause:
-                        </span>
-                        <kbd
-                          className={`px-2 py-1 border rounded text-xs font-mono ${
-                            isDarkMode
-                              ? "bg-[#272727] border-[#404040] text-gray-200"
-                              : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
-                          }`}
-                        >
-                          Ctrl + P
-                        </kbd>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span
+                            className={
+                              isDarkMode ? "text-gray-300" : "text-[#606060]"
+                            }
+                          >
+                            Play/Pause:
+                          </span>
+                          <kbd
+                            className={`px-3 py-1 border rounded text-sm font-mono ${
+                              isDarkMode
+                                ? "bg-[#272727] border-[#404040] text-gray-200"
+                                : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
+                            }`}
+                          >
+                            Ctrl + P
+                          </kbd>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span
+                            className={
+                              isDarkMode ? "text-gray-300" : "text-[#606060]"
+                            }
+                          >
+                            Back 10s:
+                          </span>
+                          <kbd
+                            className={`px-3 py-1 border rounded text-sm font-mono ${
+                              isDarkMode
+                                ? "bg-[#272727] border-[#404040] text-gray-200"
+                                : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
+                            }`}
+                          >
+                            Ctrl + B
+                          </kbd>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span
+                            className={
+                              isDarkMode ? "text-gray-300" : "text-[#606060]"
+                            }
+                          >
+                            Forward 10s:
+                          </span>
+                          <kbd
+                            className={`px-3 py-1 border rounded text-sm font-mono ${
+                              isDarkMode
+                                ? "bg-[#272727] border-[#404040] text-gray-200"
+                                : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
+                            }`}
+                          >
+                            Ctrl + F
+                          </kbd>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span
-                          className={
-                            isDarkMode ? "text-gray-300" : "text-[#606060]"
-                          }
-                        >
-                          Back 10s:
-                        </span>
-                        <kbd
-                          className={`px-2 py-1 border rounded text-xs font-mono ${
-                            isDarkMode
-                              ? "bg-[#272727] border-[#404040] text-gray-200"
-                              : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
-                          }`}
-                        >
-                          Ctrl + B
-                        </kbd>
-                      </div>
-                      <div className="flex justify-between">
-                        <span
-                          className={
-                            isDarkMode ? "text-gray-300" : "text-[#606060]"
-                          }
-                        >
-                          Forward 10s:
-                        </span>
-                        <kbd
-                          className={`px-2 py-1 border rounded text-xs font-mono ${
-                            isDarkMode
-                              ? "bg-[#272727] border-[#404040] text-gray-200"
-                              : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
-                          }`}
-                        >
-                          Ctrl + F
-                        </kbd>
-                      </div>
-                      <div className="flex justify-between">
-                        <span
-                          className={
-                            isDarkMode ? "text-gray-300" : "text-[#606060]"
-                          }
-                        >
-                          Toggle Loop:
-                        </span>
-                        <kbd
-                          className={`px-2 py-1 border rounded text-xs font-mono ${
-                            isDarkMode
-                              ? "bg-[#272727] border-[#404040] text-gray-200"
-                              : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
-                          }`}
-                        >
-                          Ctrl + L
-                        </kbd>
-                      </div>
-                      <div className="flex justify-between">
-                        <span
-                          className={
-                            isDarkMode ? "text-gray-300" : "text-[#606060]"
-                          }
-                        >
-                          Speed Up:
-                        </span>
-                        <kbd
-                          className={`px-2 py-1 border rounded text-xs font-mono ${
-                            isDarkMode
-                              ? "bg-[#272727] border-[#404040] text-gray-200"
-                              : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
-                          }`}
-                        >
-                          Ctrl + U
-                        </kbd>
-                      </div>
-                      <div className="flex justify-between">
-                        <span
-                          className={
-                            isDarkMode ? "text-gray-300" : "text-[#606060]"
-                          }
-                        >
-                          Speed Down:
-                        </span>
-                        <kbd
-                          className={`px-2 py-1 border rounded text-xs font-mono ${
-                            isDarkMode
-                              ? "bg-[#272727] border-[#404040] text-gray-200"
-                              : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
-                          }`}
-                        >
-                          Ctrl + J
-                        </kbd>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span
+                            className={
+                              isDarkMode ? "text-gray-300" : "text-[#606060]"
+                            }
+                          >
+                            Toggle Loop:
+                          </span>
+                          <kbd
+                            className={`px-3 py-1 border rounded text-sm font-mono ${
+                              isDarkMode
+                                ? "bg-[#272727] border-[#404040] text-gray-200"
+                                : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
+                            }`}
+                          >
+                            Ctrl + L
+                          </kbd>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span
+                            className={
+                              isDarkMode ? "text-gray-300" : "text-[#606060]"
+                            }
+                          >
+                            Speed Up:
+                          </span>
+                          <kbd
+                            className={`px-3 py-1 border rounded text-sm font-mono ${
+                              isDarkMode
+                                ? "bg-[#272727] border-[#404040] text-gray-200"
+                                : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
+                            }`}
+                          >
+                            Ctrl + U
+                          </kbd>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span
+                            className={
+                              isDarkMode ? "text-gray-300" : "text-[#606060]"
+                            }
+                          >
+                            Speed Down:
+                          </span>
+                          <kbd
+                            className={`px-3 py-1 border rounded text-sm font-mono ${
+                              isDarkMode
+                                ? "bg-[#272727] border-[#404040] text-gray-200"
+                                : "bg-[#f2f2f2] border-[#ccc] text-[#0f0f0f]"
+                            }`}
+                          >
+                            Ctrl + J
+                          </kbd>
+                        </div>
                       </div>
                     </div>
                   </div>
