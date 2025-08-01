@@ -1,76 +1,99 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Play, SkipBack, RotateCcw, Gauge } from "lucide-react";
 import Header from "@/components/Header";
 import VideoPlayer from "@/components/VideoPlayer";
 import LoopTimeline from "@/components/LoopTimeline";
 import LoopControls from "@/components/LoopControls";
 import Features from "@/components/Features";
+import InformationSection from "@/components/InformationSection";
+import Footer from "@/components/Footer";
 import Modal from "@/components/Modal";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
+import { extractVideoId } from "@/utils/youtube";
 
 export default function Home() {
+  // YouTube player state
+  const {
+    isPlaying,
+    currentTime,
+    duration,
+    volume,
+    isMuted,
+    playbackRate,
+    playerRef,
+    onReady,
+    onStateChange,
+    onProgress,
+    setVolume,
+    setIsMuted,
+    setPlaybackRate,
+    formatTime,
+  } = useYouTubePlayer();
+
+  // Local storage for persistence
+  const [savedData, setSavedData, isDataLoaded] = useLocalStorage<{
+    videoUrl: string;
+    videoId: string;
+    loopStart: number;
+    loopEnd: number;
+    isLooping: boolean;
+    playbackRate: number;
+    volume: number;
+    isMuted: boolean;
+    isDarkMode: boolean;
+  }>({
+    key: "youtloop-data",
+    defaultValue: {
+      videoUrl: "",
+      videoId: "",
+      loopStart: 0,
+      loopEnd: 0,
+      isLooping: false,
+      playbackRate: 1,
+      volume: 50,
+      isMuted: false,
+      isDarkMode: true,
+    },
+  });
+
+  // Local state - initialize with defaults, will be updated when localStorage loads
   const [videoUrl, setVideoUrl] = useState("");
   const [videoId, setVideoId] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [loopStart, setLoopStart] = useState(0);
   const [loopEnd, setLoopEnd] = useState(0);
   const [isLooping, setIsLooping] = useState(false);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [volume, setVolume] = useState(50);
-  const [isMuted, setIsMuted] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [showShortcuts, setShowShortcuts] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [dragType, setDragType] = useState<"start" | "end" | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const videoContainerRef = useRef<HTMLDivElement>(null);
 
-  const playerRef = useRef<any>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Refs
+  const videoContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const customTimelineRef = useRef<HTMLDivElement>(null);
-
-  // Save data to localStorage
-  const saveToLocalStorage = (data: any) => {
-    try {
-      localStorage.setItem("youtloop-data", JSON.stringify(data));
-    } catch (error) {
-      console.log("Error saving data:", error);
-    }
-  };
 
   // Theme toggle function
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Load saved data from localStorage on component mount
+  // Load saved data when localStorage becomes available
   useEffect(() => {
-    try {
-      const savedData = localStorage.getItem("youtloop-data");
-      if (savedData) {
-        const data = JSON.parse(savedData);
-        if (data.videoUrl) setVideoUrl(data.videoUrl);
-        if (data.videoId) setVideoId(data.videoId);
-        if (data.loopStart !== undefined) setLoopStart(data.loopStart);
-        if (data.loopEnd !== undefined) setLoopEnd(data.loopEnd);
-        if (data.isLooping !== undefined) setIsLooping(data.isLooping);
-        if (data.playbackRate !== undefined) setPlaybackRate(data.playbackRate);
-        if (data.volume !== undefined) setVolume(data.volume);
-        if (data.isMuted !== undefined) setIsMuted(data.isMuted);
-        if (data.isDarkMode !== undefined) setIsDarkMode(data.isDarkMode);
-      }
-    } catch (error) {
-      console.log("Error loading saved data:", error);
+    if (isDataLoaded && savedData) {
+      if (savedData.videoUrl) setVideoUrl(savedData.videoUrl);
+      if (savedData.videoId) setVideoId(savedData.videoId);
+      if (savedData.loopStart !== undefined) setLoopStart(savedData.loopStart);
+      if (savedData.loopEnd !== undefined) setLoopEnd(savedData.loopEnd);
+      if (savedData.isLooping !== undefined) setIsLooping(savedData.isLooping);
+      if (savedData.isDarkMode !== undefined)
+        setIsDarkMode(savedData.isDarkMode);
     }
-  }, []);
+  }, [isDataLoaded, savedData]);
 
   // Apply theme to document
   useEffect(() => {
@@ -94,7 +117,11 @@ export default function Home() {
       isMuted,
       isDarkMode,
     };
-    saveToLocalStorage(dataToSave);
+
+    // Only save if data has actually changed
+    if (JSON.stringify(dataToSave) !== JSON.stringify(savedData)) {
+      setSavedData(dataToSave);
+    }
   }, [
     videoUrl,
     videoId,
@@ -105,6 +132,8 @@ export default function Home() {
     volume,
     isMuted,
     isDarkMode,
+    savedData,
+    setSavedData,
   ]);
 
   // Handle clicking outside search bar to remove focus
@@ -170,12 +199,6 @@ export default function Home() {
   }, [isDragging, dragType, loopEnd, duration, loopStart]);
 
   // Extract YouTube video ID from URL
-  const extractVideoId = (url: string) => {
-    const regExp =
-      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : null;
-  };
 
   const handleUrlSubmit = () => {
     if (!videoUrl.trim()) {
@@ -251,61 +274,6 @@ export default function Home() {
     setDragType(null);
   };
 
-  const onReady = (event: any) => {
-    playerRef.current = event.target;
-    const videoDuration = event.target.getDuration();
-    setDuration(videoDuration);
-    // Set default loop to span the entire video
-    setLoopEnd(videoDuration);
-  };
-
-  const onStateChange = (event: any) => {
-    const state = event.target.getPlayerState();
-    setIsPlaying(state === 1);
-
-    // Handle video end state for looping
-    if (state === 0 && isLooping && loopEnd > loopStart) {
-      // Video ended, seek back to loop start
-      setTimeout(() => {
-        if (playerRef.current) {
-          playerRef.current.seekTo(loopStart);
-          playerRef.current.playVideo();
-        }
-      }, 100);
-    }
-  };
-
-  const onProgress = () => {
-    if (playerRef.current) {
-      const currentTime = playerRef.current.getCurrentTime();
-      setCurrentTime(currentTime);
-
-      // Handle looping
-      if (isLooping && loopEnd > loopStart) {
-        // Check if we've reached the loop end or the video end
-        if (currentTime >= loopEnd || currentTime >= duration) {
-          playerRef.current.seekTo(loopStart);
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(onProgress, 100);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isPlaying, isLooping, loopStart, loopEnd]);
-
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -341,11 +309,11 @@ export default function Home() {
             break;
           case "u":
             e.preventDefault();
-            setPlaybackRate((prev) => Math.min(2, prev + 0.25));
+            setPlaybackRate(Math.min(2, playbackRate + 0.25));
             break;
           case "j":
             e.preventDefault();
-            setPlaybackRate((prev) => Math.max(0.25, prev - 0.25));
+            setPlaybackRate(Math.max(0.25, playbackRate - 0.25));
             break;
         }
       }
@@ -373,24 +341,6 @@ export default function Home() {
       }
     }
   }, [volume, isMuted]);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const setLoopPoint = (type: "start" | "end") => {
-    if (type === "start") {
-      setLoopStart(currentTime);
-      if (loopEnd <= currentTime) {
-        setLoopEnd(Math.min(duration, currentTime + 30));
-      }
-    } else {
-      setLoopEnd(currentTime);
-    }
-    setIsLooping(true);
-  };
 
   const toggleFullscreen = () => {
     if (!videoContainerRef.current) return;
@@ -513,276 +463,11 @@ export default function Home() {
           <Features isDarkMode={isDarkMode} />
 
           {/* Information Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-            {/* What is YoutLoop */}
-            <div
-              className={`rounded-lg p-4 sm:p-6 border transition-colors duration-300 ${
-                isDarkMode
-                  ? "bg-[#1f1f1f] border-[#272727]"
-                  : "bg-[#f9f9f9] border-[#e5e5e5]"
-              }`}
-            >
-              <h3 className="text-xl sm:text-2xl font-bold mb-4 text-red-600">
-                Repeat YouTube Video in AB Loop
-              </h3>
-              <h4
-                className={`text-base sm:text-lg font-semibold mb-3 ${
-                  isDarkMode ? "text-white" : "text-[#0f0f0f]"
-                }`}
-              >
-                What is YoutLoop:
-              </h4>
-              <p
-                className={`leading-relaxed mb-4 text-sm sm:text-base ${
-                  isDarkMode ? "text-gray-300" : "text-[#606060]"
-                }`}
-              >
-                YoutLoop is a free online tool to repeat any YouTube videos.
-                Just select YouTube videos by typing a URL in the search bar,
-                and you can set AB loop in any point of the video. This is
-                useful when you want to learn some kind of skills (such as
-                languages, sports, music, etc.) by watching a specific part over
-                and over.
-              </p>
-
-              <h4
-                className={`text-base sm:text-lg font-semibold mb-3 ${
-                  isDarkMode ? "text-white" : "text-[#0f0f0f]"
-                }`}
-              >
-                Features:
-              </h4>
-              <ul
-                className={`space-y-2 text-sm sm:text-base ${
-                  isDarkMode ? "text-gray-300" : "text-[#606060]"
-                }`}
-              >
-                <li className="flex items-start gap-2">
-                  <span className="w-2 h-2 bg-red-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <span>Select any YouTube videos by pasting the URL</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="w-2 h-2 bg-red-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <span>
-                    Repeat full or a part of YouTube video in infinite loop
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="w-2 h-2 bg-red-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <span>
-                    Control video with simple buttons or keyboard shortcuts
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="w-2 h-2 bg-red-600 rounded-full mt-2 flex-shrink-0"></span>
-                  <span>
-                    Take notes while controlling video with keyboard shortcuts
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Keyboard Shortcuts */}
-            <div
-              className={`rounded-lg p-4 sm:p-6 border transition-colors duration-300 ${
-                isDarkMode
-                  ? "bg-[#1f1f1f] border-[#272727]"
-                  : "bg-[#f9f9f9] border-[#e5e5e5]"
-              }`}
-            >
-              <h3 className="text-xl sm:text-2xl font-bold mb-4 text-red-600">
-                Keyboard Shortcuts
-              </h3>
-              <p
-                className={`mb-6 text-sm sm:text-base ${
-                  isDarkMode ? "text-gray-300" : "text-[#606060]"
-                }`}
-              >
-                Master your video control with these powerful keyboard
-                shortcuts:
-              </p>
-
-              <div className="space-y-3 sm:space-y-4">
-                <div
-                  className={`flex items-center justify-between p-2 sm:p-3 rounded-lg border ${
-                    isDarkMode
-                      ? "bg-[#272727] border-[#404040]"
-                      : "bg-[#f2f2f2] border-[#e5e5e5]"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-600 rounded-full flex items-center justify-center">
-                      <Play size={14} className="sm:w-4 sm:h-4 text-white" />
-                    </div>
-                    <span
-                      className={`font-medium text-sm sm:text-base ${
-                        isDarkMode ? "text-gray-200" : "text-[#0f0f0f]"
-                      }`}
-                    >
-                      Pause/Play
-                    </span>
-                  </div>
-                  <kbd
-                    className={`px-2 sm:px-3 py-1 border rounded text-xs sm:text-sm font-mono ${
-                      isDarkMode
-                        ? "bg-[#1f1f1f] border-[#404040] text-gray-200"
-                        : "bg-white border-[#ccc] text-[#0f0f0f]"
-                    }`}
-                  >
-                    Control + P
-                  </kbd>
-                </div>
-
-                <div
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
-                    isDarkMode
-                      ? "bg-[#272727] border-[#404040]"
-                      : "bg-[#f2f2f2] border-[#e5e5e5]"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                      <SkipBack size={16} className="text-white" />
-                    </div>
-                    <span
-                      className={`font-medium ${
-                        isDarkMode ? "text-gray-200" : "text-[#0f0f0f]"
-                      }`}
-                    >
-                      Back
-                    </span>
-                  </div>
-                  <kbd
-                    className={`px-3 py-1 border rounded text-sm font-mono ${
-                      isDarkMode
-                        ? "bg-[#1f1f1f] border-[#404040] text-gray-200"
-                        : "bg-white border-[#ccc] text-[#0f0f0f]"
-                    }`}
-                  >
-                    Control + B
-                  </kbd>
-                </div>
-
-                <div
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
-                    isDarkMode
-                      ? "bg-[#272727] border-[#404040]"
-                      : "bg-[#f2f2f2] border-[#e5e5e5]"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                      <RotateCcw size={16} className="text-white" />
-                    </div>
-                    <span
-                      className={`font-medium ${
-                        isDarkMode ? "text-gray-200" : "text-[#0f0f0f]"
-                      }`}
-                    >
-                      Loop
-                    </span>
-                  </div>
-                  <kbd
-                    className={`px-3 py-1 border rounded text-sm font-mono ${
-                      isDarkMode
-                        ? "bg-[#1f1f1f] border-[#404040] text-gray-200"
-                        : "bg-white border-[#ccc] text-[#0f0f0f]"
-                    }`}
-                  >
-                    Control + L
-                  </kbd>
-                </div>
-
-                <div
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
-                    isDarkMode
-                      ? "bg-[#272727] border-[#404040]"
-                      : "bg-[#f2f2f2] border-[#e5e5e5]"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                      <Gauge size={16} className="text-white" />
-                    </div>
-                    <span
-                      className={`font-medium ${
-                        isDarkMode ? "text-gray-200" : "text-[#0f0f0f]"
-                      }`}
-                    >
-                      Speed up
-                    </span>
-                  </div>
-                  <kbd
-                    className={`px-3 py-1 border rounded text-sm font-mono ${
-                      isDarkMode
-                        ? "bg-[#1f1f1f] border-[#404040] text-gray-200"
-                        : "bg-white border-[#ccc] text-[#0f0f0f]"
-                    }`}
-                  >
-                    Control + U
-                  </kbd>
-                </div>
-
-                <div
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
-                    isDarkMode
-                      ? "bg-[#272727] border-[#404040]"
-                      : "bg-[#f2f2f2] border-[#e5e5e5]"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                      <Gauge size={16} className="text-white" />
-                    </div>
-                    <span
-                      className={`font-medium ${
-                        isDarkMode ? "text-gray-200" : "text-[#0f0f0f]"
-                      }`}
-                    >
-                      Speed down
-                    </span>
-                  </div>
-                  <kbd
-                    className={`px-3 py-1 border rounded text-sm font-mono ${
-                      isDarkMode
-                        ? "bg-[#1f1f1f] border-[#404040] text-gray-200"
-                        : "bg-white border-[#ccc] text-[#0f0f0f]"
-                    }`}
-                  >
-                    Control + J
-                  </kbd>
-                </div>
-              </div>
-
-              <div className="mt-6 p-4 bg-red-600/10 rounded-lg border border-red-600/20">
-                <p
-                  className={`text-sm text-center ${
-                    isDarkMode ? "text-gray-300" : "text-[#606060]"
-                  }`}
-                >
-                  💡 <strong>Pro Tip:</strong> Use keyboard shortcuts for
-                  hands-free learning while taking notes!
-                </p>
-              </div>
-            </div>
-          </div>
+          <InformationSection isDarkMode={isDarkMode} />
         </div>
 
         {/* Footer */}
-        <footer className="text-center mt-8 sm:mt-12">
-          <p
-            className={`text-sm sm:text-base ${isDarkMode ? "text-gray-400" : "text-[#606060]"}`}
-          >
-            Made with ❤️ for learning and practice
-          </p>
-          <p
-            className={`text-xs sm:text-sm mt-2 ${
-              isDarkMode ? "text-gray-400" : "text-[#606060]"
-            }`}
-          >
-            Inspired by LoopTube
-          </p>
-        </footer>
+        <Footer isDarkMode={isDarkMode} />
       </div>
 
       <Modal
