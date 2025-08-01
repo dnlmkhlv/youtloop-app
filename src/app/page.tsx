@@ -320,6 +320,14 @@ export default function Home() {
     setModalMessage("");
   };
 
+  const handleReset = useCallback(() => {
+    setVideoUrl("");
+    setVideoId("");
+    setLoopStart(0);
+    setLoopEnd(0);
+    setIsLooping(false);
+  }, []);
+
   const handleCustomTimelineClick = (
     event: React.MouseEvent<HTMLDivElement>
   ) => {
@@ -491,6 +499,7 @@ export default function Home() {
         isDarkMode={isDarkMode}
         toggleTheme={toggleTheme}
         searchInputRef={searchInputRef}
+        handleReset={handleReset}
       />
 
       <div className="container mx-auto px-4 py-4 sm:py-8">

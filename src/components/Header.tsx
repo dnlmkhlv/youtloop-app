@@ -10,6 +10,7 @@ interface HeaderProps {
   isDarkMode: boolean;
   toggleTheme: () => void;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
+  handleReset: () => void;
 }
 
 export default function Header({
@@ -19,6 +20,7 @@ export default function Header({
   isDarkMode,
   toggleTheme,
   searchInputRef,
+  handleReset,
 }: HeaderProps) {
   return (
     <header
@@ -30,7 +32,13 @@ export default function Header({
     >
       <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 gap-4">
         {/* Left side - Logo */}
-        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity duration-200"
+          onClick={handleReset}
+          role="button"
+          tabIndex={0}
+          onKeyPress={(e) => e.key === "Enter" && handleReset()}
+        >
           <Image
             src="/youtloop-logo.svg"
             alt="YoutLoop Logo"
