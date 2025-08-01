@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   keywords: "YouTube, video loop, AB loop, learning, practice, video player",
   authors: [{ name: "YouTLoop" }],
   viewport: "width=device-width, initial-scale=1",
-  metadataBase: new URL("https://youtloop.vercel.app"),
+  metadataBase: new URL("https://youtloop-app.vercel.app"),
   openGraph: {
     title: "YouTLoop - Loop YouTube Videos with Precision",
     description:
