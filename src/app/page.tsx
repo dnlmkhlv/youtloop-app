@@ -233,31 +233,22 @@ export default function Home() {
         }`}
       >
         <div className="flex items-center justify-between px-4 py-3">
-          {/* Left side - Menu and Logo */}
-          <div className="flex items-center gap-4">
-            <button
-              className={`p-2 rounded-full hover:bg-opacity-80 transition-colors ${
-                isDarkMode ? "hover:bg-[#272727]" : "hover:bg-[#f2f2f2]"
+          {/* Left side - Logo */}
+          <div className="flex items-center gap-2">
+            <Image
+              src="/youtloop-logo.svg"
+              alt="YoutLoop Logo"
+              width={40}
+              height={40}
+              priority
+            />
+            <h1
+              className={`text-xl font-bold ${
+                isDarkMode ? "text-white" : "text-[#0f0f0f]"
               }`}
             >
-              <Menu size={20} />
-            </button>
-            <div className="flex items-center gap-2">
-              <Image
-                src="/youtloop-logo.svg"
-                alt="YoutLoop Logo"
-                width={32}
-                height={32}
-                priority
-              />
-              <h1
-                className={`text-xl font-bold ${
-                  isDarkMode ? "text-white" : "text-[#0f0f0f]"
-                }`}
-              >
-                YoutLoop
-              </h1>
-            </div>
+              YoutLoop
+            </h1>
           </div>
 
           {/* Center - Search Bar */}
