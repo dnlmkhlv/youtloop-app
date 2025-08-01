@@ -58,7 +58,7 @@ export default function Footer({ isDarkMode }: FooterProps) {
               Terms
             </a>
             <a
-              href="mailto:contact@daniilmikhailov.com"
+              href="mailto:youtloop2025@gmail.com"
               className={`text-sm hover:underline ${
                 isDarkMode
                   ? "text-gray-400 hover:text-white"

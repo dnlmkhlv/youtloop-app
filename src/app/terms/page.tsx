@@ -138,10 +138,10 @@ export default function Terms() {
                 For any questions about these Terms of Service, please contact
                 us at{" "}
                 <a
-                  href="mailto:contact@daniilmikhailov.com"
+                  href="mailto:youtloop2025@gmail.com"
                   className="text-white underline hover:text-gray-300"
                 >
-                  contact@daniilmikhailov.com
+                  youtloop2025@gmail.com
                 </a>
                 .
               </p>
