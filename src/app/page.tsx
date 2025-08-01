@@ -123,7 +123,7 @@ export default function Home() {
     if (id) {
       setVideoId(id);
       setLoopStart(0);
-      setLoopEnd(30);
+      setLoopEnd(0); // Will be set to duration when video loads
       setIsLooping(false);
     } else {
       setModalMessage("Please enter a valid YouTube URL");
@@ -185,7 +185,10 @@ export default function Home() {
 
   const onReady = (event: any) => {
     playerRef.current = event.target;
-    setDuration(event.target.getDuration());
+    const videoDuration = event.target.getDuration();
+    setDuration(videoDuration);
+    // Set default loop to span the entire video
+    setLoopEnd(videoDuration);
   };
 
   const onStateChange = (event: any) => {
