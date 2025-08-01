@@ -307,7 +307,10 @@ export default function Home() {
     if (id) {
       setVideoId(id);
       setLoopStart(0);
-      setLoopEnd(0); // Will be set to duration when video loads
+      // If we already have a duration, use it; otherwise it will be set when video loads
+      if (duration) {
+        setLoopEnd(duration);
+      }
       setIsLooping(true); // Enable looping by default
     } else {
       setModalMessage("Please enter a valid YouTube URL");
@@ -324,9 +327,9 @@ export default function Home() {
     setVideoUrl("");
     setVideoId("");
     setLoopStart(0);
-    setLoopEnd(0);
+    setLoopEnd(duration || 0); // Use current duration if available
     setIsLooping(false);
-  }, []);
+  }, [duration]);
 
   const handleCustomTimelineClick = (
     event: React.MouseEvent<HTMLDivElement>
@@ -420,6 +423,13 @@ export default function Home() {
       }
     }
   }, [volume, isMuted]);
+
+  // Update loop end when duration becomes available
+  useEffect(() => {
+    if (duration && loopEnd === 0) {
+      setLoopEnd(duration);
+    }
+  }, [duration, loopEnd]);
 
   // Handle video looping
   useEffect(() => {
