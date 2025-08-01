@@ -124,7 +124,7 @@ export default function Home() {
       setVideoId(id);
       setLoopStart(0);
       setLoopEnd(0); // Will be set to duration when video loads
-      setIsLooping(false);
+      setIsLooping(true); // Enable looping by default
     } else {
       setModalMessage("Please enter a valid YouTube URL");
       setShowModal(true);
