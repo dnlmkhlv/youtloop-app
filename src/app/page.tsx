@@ -453,16 +453,20 @@ export default function Home() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => playerRef.current?.playVideo()}
+                        onClick={() => {
+                          if (isPlaying) {
+                            playerRef.current?.pauseVideo();
+                          } else {
+                            playerRef.current?.playVideo();
+                          }
+                        }}
                         className="p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
                       >
-                        <Play size={20} className="text-white" />
-                      </button>
-                      <button
-                        onClick={() => playerRef.current?.pauseVideo()}
-                        className="p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
-                      >
-                        <Pause size={20} className="text-white" />
+                        {isPlaying ? (
+                          <Pause size={20} className="text-white" />
+                        ) : (
+                          <Play size={20} className="text-white" />
+                        )}
                       </button>
                       <button
                         onClick={() =>
