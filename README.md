@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YouTLoop 🎬
 
-## Getting Started
+A modern YouTube video looping application inspired by LoopTube. Loop any YouTube video with precision using AB loop functionality, perfect for learning languages, sports, music, and more.
 
-First, run the development server:
+## ✨ Features
+
+- **AB Loop**: Set precise start and end points for seamless looping
+- **Keyboard Shortcuts**: Full keyboard support for hands-free video control
+- **Speed Control**: Adjust playback speed from 0.25x to 2x
+- **Volume Control**: Mute/unmute and volume adjustment
+- **Modern UI**: Beautiful gradient design with glass morphism effects
+- **Responsive Design**: Works perfectly on desktop and mobile devices
+- **Real-time Progress**: Visual progress bar with loop indicators
+
+## 🎮 Keyboard Shortcuts
+
+| Action             | Shortcut   |
+| ------------------ | ---------- |
+| Play/Pause         | `Ctrl + P` |
+| Back 10 seconds    | `Ctrl + B` |
+| Forward 10 seconds | `Ctrl + F` |
+| Toggle Loop        | `Ctrl + L` |
+| Speed Up           | `Ctrl + U` |
+| Speed Down         | `Ctrl + J` |
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <your-repo-url>
+cd youtloop-app
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎯 How to Use
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Load a Video**: Paste any YouTube URL in the input field and click "Load"
+2. **Set Loop Points**:
+   - Click "Set Start" to mark the beginning of your loop
+   - Click "Set End" to mark the end of your loop
+   - Or use `Ctrl + L` to quickly set a 30-second loop from current position
+3. **Control Playback**: Use the on-screen controls or keyboard shortcuts
+4. **Adjust Settings**: Change playback speed, volume, and other settings as needed
 
-## Learn More
+## 🛠️ Built With
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js 15** - React framework
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **react-youtube** - YouTube player integration
+- **Lucide React** - Beautiful icons
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📱 Features in Detail
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### AB Loop System
 
-## Deploy on Vercel
+- Set precise start and end points for looping
+- Visual indicators on the progress bar
+- Automatic loop when video reaches end point
+- Easy enable/disable toggle
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Video Controls
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Play/pause functionality
+- Skip forward/backward 10 seconds
+- Volume control with mute option
+- Playback speed adjustment (0.25x - 2x)
+
+### User Experience
+
+- Responsive design that works on all devices
+- Beautiful gradient background with glass morphism
+- Smooth animations and transitions
+- Intuitive interface design
+
+## 🎨 Design Philosophy
+
+YouTLoop focuses on simplicity and functionality. The interface is designed to be:
+
+- **Intuitive**: Easy to understand and use
+- **Beautiful**: Modern design with attention to detail
+- **Functional**: All features are easily accessible
+- **Responsive**: Works perfectly on any device
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Inspired by [LoopTube](https://looptube.io/)
+- Built with modern web technologies
+- Icons from [Lucide](https://lucide.dev/)
+
+---
+
+Made with ❤️ for learning and practice
