@@ -496,7 +496,7 @@ export default function Home() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setLoopPoint("start")}
-                          className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-all duration-300 text-white"
+                          className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition-all duration-300 text-white"
                         >
                           Set Start ({formatTime(loopStart)})
                         </button>
