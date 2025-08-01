@@ -20,6 +20,8 @@ import {
   Search,
   Menu,
   Gauge,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 
 export default function Home() {
@@ -41,6 +43,8 @@ export default function Home() {
   const [modalMessage, setModalMessage] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [dragType, setDragType] = useState<"start" | "end" | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -347,6 +351,51 @@ export default function Home() {
     setIsLooping(true);
   };
 
+  const toggleFullscreen = () => {
+    if (!videoContainerRef.current) return;
+
+    if (!isFullscreen) {
+      if (videoContainerRef.current.requestFullscreen) {
+        videoContainerRef.current.requestFullscreen();
+      } else if ((videoContainerRef.current as any).webkitRequestFullscreen) {
+        (videoContainerRef.current as any).webkitRequestFullscreen();
+      } else if ((videoContainerRef.current as any).msRequestFullscreen) {
+        (videoContainerRef.current as any).msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      } else if ((document as any).msExitFullscreen) {
+        (document as any).msExitFullscreen();
+      }
+    }
+  };
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+    document.addEventListener("msfullscreenchange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener(
+        "webkitfullscreenchange",
+        handleFullscreenChange
+      );
+      document.removeEventListener(
+        "msfullscreenchange",
+        handleFullscreenChange
+      );
+    };
+  }, []);
+
   return (
     <div
       className={`min-h-screen transition-colors duration-300 ${
@@ -435,7 +484,10 @@ export default function Home() {
           {/* Video Player Section */}
           {videoId && (
             <div className="mb-8">
-              <div className="relative bg-black rounded-lg overflow-hidden shadow-lg">
+              <div
+                ref={videoContainerRef}
+                className="relative bg-black rounded-lg overflow-hidden shadow-lg"
+              >
                 <div
                   className="relative w-full"
                   style={{ paddingBottom: "56.25%" }}
@@ -591,6 +643,26 @@ export default function Home() {
                             <option value={1.75}>1.75x</option>
                             <option value={2}>2x</option>
                           </select>
+                        </div>
+
+                        {/* Fullscreen Button */}
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <button
+                            onClick={toggleFullscreen}
+                            className="p-1 sm:p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
+                          >
+                            {isFullscreen ? (
+                              <Minimize2
+                                size={16}
+                                className="sm:w-5 sm:h-5 text-white"
+                              />
+                            ) : (
+                              <Maximize2
+                                size={16}
+                                className="sm:w-5 sm:h-5 text-white"
+                              />
+                            )}
+                          </button>
                         </div>
                       </div>
                     </div>
