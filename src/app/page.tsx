@@ -338,7 +338,7 @@ export default function Home() {
             : "bg-white border-[#e5e5e5]"
         }`}
       >
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 gap-4">
           {/* Left side - Logo */}
           <div className="flex items-center gap-2">
             <Image
@@ -349,7 +349,7 @@ export default function Home() {
               priority
             />
             <h1
-              className={`text-xl font-bold ${
+              className={`text-lg sm:text-xl font-bold ${
                 isDarkMode ? "text-white" : "text-[#0f0f0f]"
               }`}
             >
@@ -358,7 +358,7 @@ export default function Home() {
           </div>
 
           {/* Center - Search Bar */}
-          <div className="flex-1 max-w-2xl mx-8">
+          <div className="flex-1 w-full sm:max-w-2xl sm:mx-8">
             <div className="flex">
               <input
                 ref={searchInputRef}
@@ -366,7 +366,7 @@ export default function Home() {
                 placeholder="Paste YouTube URL here..."
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
-                className={`flex-1 px-4 py-2 border-l border-t border-b rounded-l-full transition-colors duration-300 focus:outline-none ${
+                className={`flex-1 px-3 sm:px-4 py-2 border-l border-t border-b rounded-l-full transition-colors duration-300 focus:outline-none text-sm sm:text-base ${
                   isDarkMode
                     ? "bg-[#121212] border-[#303030] text-white placeholder-[#aaa]"
                     : "bg-white border-[#ccc] text-[#0f0f0f] placeholder-[#606060]"
@@ -375,13 +375,13 @@ export default function Home() {
               />
               <button
                 onClick={handleUrlSubmit}
-                className={`px-6 py-2 border-r border-t border-b rounded-r-full transition-colors duration-300 ${
+                className={`px-4 sm:px-6 py-2 border-r border-t border-b rounded-r-full transition-colors duration-300 ${
                   isDarkMode
                     ? "bg-[#222] border-[#303030] hover:bg-[#303030]"
                     : "bg-[#f8f8f8] border-[#ccc] hover:bg-[#e5e5e5]"
                 }`}
               >
-                <Search size={20} />
+                <Search size={18} className="sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
@@ -396,13 +396,17 @@ export default function Home() {
                   : "hover:bg-[#f2f2f2] text-[#0f0f0f]"
               }`}
             >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              {isDarkMode ? (
+                <Sun size={18} className="sm:w-5 sm:h-5" />
+              ) : (
+                <Moon size={18} className="sm:w-5 sm:h-5" />
+              )}
             </button>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 sm:py-8">
         {/* Main Content */}
         <div className="max-w-6xl mx-auto">
           {/* Video Player Section */}
@@ -415,7 +419,7 @@ export default function Home() {
                   onStateChange={onStateChange}
                   opts={{
                     width: "100%",
-                    height: "500",
+                    height: "300",
                     playerVars: {
                       autoplay: 0,
                       controls: 0,
@@ -423,13 +427,14 @@ export default function Home() {
                       rel: 0,
                     },
                   }}
+                  className="w-full h-[300px] sm:h-[400px] md:h-[500px]"
                 />
 
                 {/* YouTube-style Controls Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-2 sm:p-4">
                   {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm mb-1">
+                  <div className="mb-2 sm:mb-4">
+                    <div className="flex justify-between text-xs sm:text-sm mb-1">
                       <span className="text-gray-300">
                         {formatTime(currentTime)}
                       </span>
@@ -451,7 +456,7 @@ export default function Home() {
 
                   {/* Control Buttons */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2">
                       <button
                         onClick={() => {
                           if (isPlaying) {
@@ -460,12 +465,18 @@ export default function Home() {
                             playerRef.current?.playVideo();
                           }
                         }}
-                        className="p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
+                        className="p-1 sm:p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
                       >
                         {isPlaying ? (
-                          <Pause size={20} className="text-white" />
+                          <Pause
+                            size={16}
+                            className="sm:w-5 sm:h-5 text-white"
+                          />
                         ) : (
-                          <Play size={20} className="text-white" />
+                          <Play
+                            size={16}
+                            className="sm:w-5 sm:h-5 text-white"
+                          />
                         )}
                       </button>
                       <button
@@ -474,9 +485,12 @@ export default function Home() {
                             Math.max(0, currentTime - 10)
                           )
                         }
-                        className="p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
+                        className="p-1 sm:p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
                       >
-                        <SkipBack size={20} className="text-white" />
+                        <SkipBack
+                          size={16}
+                          className="sm:w-5 sm:h-5 text-white"
+                        />
                       </button>
                       <button
                         onClick={() =>
@@ -484,23 +498,32 @@ export default function Home() {
                             Math.min(duration, currentTime + 10)
                           )
                         }
-                        className="p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
+                        className="p-1 sm:p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
                       >
-                        <SkipForward size={20} className="text-white" />
+                        <SkipForward
+                          size={16}
+                          className="sm:w-5 sm:h-5 text-white"
+                        />
                       </button>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
                       {/* Volume Control */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2">
                         <button
                           onClick={() => setIsMuted(!isMuted)}
-                          className="p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
+                          className="p-1 sm:p-2 hover:bg-white/10 rounded-full transition-all duration-300 hover:scale-110"
                         >
                           {isMuted ? (
-                            <VolumeX size={20} className="text-white" />
+                            <VolumeX
+                              size={16}
+                              className="sm:w-5 sm:h-5 text-white"
+                            />
                           ) : (
-                            <Volume2 size={20} className="text-white" />
+                            <Volume2
+                              size={16}
+                              className="sm:w-5 sm:h-5 text-white"
+                            />
                           )}
                         </button>
                         <input
@@ -509,19 +532,19 @@ export default function Home() {
                           max="100"
                           value={volume}
                           onChange={(e) => setVolume(Number(e.target.value))}
-                          className="w-20"
+                          className="w-12 sm:w-20"
                         />
                       </div>
 
                       {/* Playback Rate */}
-                      <div className="flex items-center gap-2">
-                        <Gauge size={16} className="text-white" />
+                      <div className="flex items-center gap-1 sm:gap-2">
+                        <Gauge size={14} className="sm:w-4 sm:h-4 text-white" />
                         <select
                           value={playbackRate}
                           onChange={(e) =>
                             setPlaybackRate(Number(e.target.value))
                           }
-                          className={`border rounded px-2 py-1 text-sm transition-colors duration-300 ${
+                          className={`border rounded px-1 sm:px-2 py-1 text-xs sm:text-sm transition-colors duration-300 ${
                             isDarkMode
                               ? "bg-[#272727] border-[#404040] text-white focus:border-[#1c62b9]"
                               : "bg-white border-[#ccc] text-[#0f0f0f] focus:border-[#1c62b9]"
@@ -638,7 +661,7 @@ export default function Home() {
                   Loop Controls
                 </h3>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
                   {/* Loop Status */}
                   <div className="lg:col-span-1">
                     <h4
@@ -651,7 +674,7 @@ export default function Home() {
                     <div className="flex flex-col gap-3">
                       <button
                         onClick={() => setIsLooping(!isLooping)}
-                        className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 w-fit ${
+                        className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm font-medium transition-all duration-300 w-fit ${
                           isLooping
                             ? "bg-red-600 hover:bg-red-700 text-white"
                             : isDarkMode
@@ -679,7 +702,7 @@ export default function Home() {
                     >
                       Keyboard Shortcuts
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
                           <span
@@ -801,26 +824,26 @@ export default function Home() {
 
           {/* Features Section */}
           <div className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               <div
-                className={`rounded-lg p-6 text-center border transition-all duration-300 hover:scale-105 ${
+                className={`rounded-lg p-4 sm:p-6 text-center border transition-all duration-300 hover:scale-105 ${
                   isDarkMode
                     ? "bg-[#1f1f1f] border-[#272727] hover:bg-[#272727]"
                     : "bg-[#f9f9f9] border-[#e5e5e5] hover:bg-[#f2f2f2]"
                 }`}
               >
-                <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <RotateCcw size={24} className="text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
+                  <RotateCcw size={20} className="sm:w-6 sm:h-6 text-white" />
                 </div>
                 <h3
-                  className={`font-semibold mb-2 ${
+                  className={`font-semibold mb-2 text-sm sm:text-base ${
                     isDarkMode ? "text-white" : "text-[#0f0f0f]"
                   }`}
                 >
                   AB Loop
                 </h3>
                 <p
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     isDarkMode ? "text-gray-300" : "text-[#606060]"
                   }`}
                 >
@@ -828,24 +851,24 @@ export default function Home() {
                 </p>
               </div>
               <div
-                className={`rounded-lg p-6 text-center border transition-all duration-300 hover:scale-105 ${
+                className={`rounded-lg p-4 sm:p-6 text-center border transition-all duration-300 hover:scale-105 ${
                   isDarkMode
                     ? "bg-[#1f1f1f] border-[#272727] hover:bg-[#272727]"
                     : "bg-[#f9f9f9] border-[#e5e5e5] hover:bg-[#f2f2f2]"
                 }`}
               >
-                <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <Keyboard size={24} className="text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
+                  <Keyboard size={20} className="sm:w-6 sm:h-6 text-white" />
                 </div>
                 <h3
-                  className={`font-semibold mb-2 ${
+                  className={`font-semibold mb-2 text-sm sm:text-base ${
                     isDarkMode ? "text-white" : "text-[#0f0f0f]"
                   }`}
                 >
                   Keyboard Controls
                 </h3>
                 <p
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     isDarkMode ? "text-gray-300" : "text-[#606060]"
                   }`}
                 >
@@ -853,24 +876,24 @@ export default function Home() {
                 </p>
               </div>
               <div
-                className={`rounded-lg p-6 text-center border transition-all duration-300 hover:scale-105 ${
+                className={`rounded-lg p-4 sm:p-6 text-center border transition-all duration-300 hover:scale-105 ${
                   isDarkMode
                     ? "bg-[#1f1f1f] border-[#272727] hover:bg-[#272727]"
                     : "bg-[#f9f9f9] border-[#e5e5e5] hover:bg-[#f2f2f2]"
                 }`}
               >
-                <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <Gauge size={24} className="text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
+                  <Gauge size={20} className="sm:w-6 sm:h-6 text-white" />
                 </div>
                 <h3
-                  className={`font-semibold mb-2 ${
+                  className={`font-semibold mb-2 text-sm sm:text-base ${
                     isDarkMode ? "text-white" : "text-[#0f0f0f]"
                   }`}
                 >
                   Speed Control
                 </h3>
                 <p
-                  className={`text-sm ${
+                  className={`text-xs sm:text-sm ${
                     isDarkMode ? "text-gray-300" : "text-[#606060]"
                   }`}
                 >
@@ -881,27 +904,27 @@ export default function Home() {
           </div>
 
           {/* Information Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {/* What is YoutLoop */}
             <div
-              className={`rounded-lg p-6 border transition-colors duration-300 ${
+              className={`rounded-lg p-4 sm:p-6 border transition-colors duration-300 ${
                 isDarkMode
                   ? "bg-[#1f1f1f] border-[#272727]"
                   : "bg-[#f9f9f9] border-[#e5e5e5]"
               }`}
             >
-              <h3 className="text-2xl font-bold mb-4 text-red-600">
+              <h3 className="text-xl sm:text-2xl font-bold mb-4 text-red-600">
                 Repeat YouTube Video in AB Loop
               </h3>
               <h4
-                className={`text-lg font-semibold mb-3 ${
+                className={`text-base sm:text-lg font-semibold mb-3 ${
                   isDarkMode ? "text-white" : "text-[#0f0f0f]"
                 }`}
               >
                 What is YoutLoop:
               </h4>
               <p
-                className={`leading-relaxed mb-4 ${
+                className={`leading-relaxed mb-4 text-sm sm:text-base ${
                   isDarkMode ? "text-gray-300" : "text-[#606060]"
                 }`}
               >
@@ -914,14 +937,14 @@ export default function Home() {
               </p>
 
               <h4
-                className={`text-lg font-semibold mb-3 ${
+                className={`text-base sm:text-lg font-semibold mb-3 ${
                   isDarkMode ? "text-white" : "text-[#0f0f0f]"
                 }`}
               >
                 Features:
               </h4>
               <ul
-                className={`space-y-2 ${
+                className={`space-y-2 text-sm sm:text-base ${
                   isDarkMode ? "text-gray-300" : "text-[#606060]"
                 }`}
               >
@@ -952,17 +975,17 @@ export default function Home() {
 
             {/* Keyboard Shortcuts */}
             <div
-              className={`rounded-lg p-6 border transition-colors duration-300 ${
+              className={`rounded-lg p-4 sm:p-6 border transition-colors duration-300 ${
                 isDarkMode
                   ? "bg-[#1f1f1f] border-[#272727]"
                   : "bg-[#f9f9f9] border-[#e5e5e5]"
               }`}
             >
-              <h3 className="text-2xl font-bold mb-4 text-red-600">
+              <h3 className="text-xl sm:text-2xl font-bold mb-4 text-red-600">
                 Keyboard Shortcuts
               </h3>
               <p
-                className={`mb-6 ${
+                className={`mb-6 text-sm sm:text-base ${
                   isDarkMode ? "text-gray-300" : "text-[#606060]"
                 }`}
               >
@@ -970,20 +993,20 @@ export default function Home() {
                 shortcuts:
               </p>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
+                  className={`flex items-center justify-between p-2 sm:p-3 rounded-lg border ${
                     isDarkMode
                       ? "bg-[#272727] border-[#404040]"
                       : "bg-[#f2f2f2] border-[#e5e5e5]"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                      <Play size={16} className="text-white" />
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-600 rounded-full flex items-center justify-center">
+                      <Play size={14} className="sm:w-4 sm:h-4 text-white" />
                     </div>
                     <span
-                      className={`font-medium ${
+                      className={`font-medium text-sm sm:text-base ${
                         isDarkMode ? "text-gray-200" : "text-[#0f0f0f]"
                       }`}
                     >
@@ -991,7 +1014,7 @@ export default function Home() {
                     </span>
                   </div>
                   <kbd
-                    className={`px-3 py-1 border rounded text-sm font-mono ${
+                    className={`px-2 sm:px-3 py-1 border rounded text-xs sm:text-sm font-mono ${
                       isDarkMode
                         ? "bg-[#1f1f1f] border-[#404040] text-gray-200"
                         : "bg-white border-[#ccc] text-[#0f0f0f]"
@@ -1137,12 +1160,14 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="text-center mt-12">
-          <p className={isDarkMode ? "text-gray-400" : "text-[#606060]"}>
+        <footer className="text-center mt-8 sm:mt-12">
+          <p
+            className={`text-sm sm:text-base ${isDarkMode ? "text-gray-400" : "text-[#606060]"}`}
+          >
             Made with ❤️ for learning and practice
           </p>
           <p
-            className={`text-sm mt-2 ${
+            className={`text-xs sm:text-sm mt-2 ${
               isDarkMode ? "text-gray-400" : "text-[#606060]"
             }`}
           >
