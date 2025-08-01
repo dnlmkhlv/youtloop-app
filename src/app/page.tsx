@@ -527,20 +527,36 @@ export default function Home() {
 
           {/* Custom Timeline for Loop Control */}
           {videoId && (
-            <div className="mt-4 p-4 bg-black/20 rounded-lg">
-              <div className="mb-2 flex justify-between text-sm text-gray-300">
-                <span>Loop Timeline</span>
-                <span>{formatTime(duration)}</span>
+            <div
+              className={`mt-4 p-4 rounded-lg border transition-colors duration-300 ${
+                isDarkMode
+                  ? "bg-[#1f1f1f] border-[#272727]"
+                  : "bg-[#f9f9f9] border-[#e5e5e5]"
+              }`}
+            >
+              <div className="mb-2 flex justify-between text-sm">
+                <span
+                  className={isDarkMode ? "text-gray-200" : "text-[#606060]"}
+                >
+                  Loop Timeline
+                </span>
+                <span
+                  className={isDarkMode ? "text-gray-200" : "text-[#606060]"}
+                >
+                  {formatTime(duration)}
+                </span>
               </div>
               <div
                 ref={customTimelineRef}
-                className="relative h-8 bg-gray-700/50 rounded-lg cursor-pointer"
+                className={`relative h-8 rounded-lg cursor-pointer transition-colors duration-300 ${
+                  isDarkMode ? "bg-[#272727]" : "bg-[#e5e5e5]"
+                }`}
                 onClick={handleCustomTimelineClick}
               >
                 {/* Loop Segment */}
                 {isLooping && (
                   <div
-                    className="absolute h-full bg-pink-500/60 rounded-lg"
+                    className="absolute h-full bg-red-500/60 rounded-lg"
                     style={{
                       left: `${(loopStart / duration) * 100}%`,
                       width: `${((loopEnd - loopStart) / duration) * 100}%`,
