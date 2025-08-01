@@ -19,6 +19,7 @@ import {
   Moon,
   Search,
   Menu,
+  Gauge,
 } from "lucide-react";
 
 export default function Home() {
@@ -433,26 +434,29 @@ export default function Home() {
                       </div>
 
                       {/* Playback Rate */}
-                      <select
-                        value={playbackRate}
-                        onChange={(e) =>
-                          setPlaybackRate(Number(e.target.value))
-                        }
-                        className={`border rounded px-2 py-1 text-sm transition-colors duration-300 ${
-                          isDarkMode
-                            ? "bg-[#272727] border-[#404040] text-white focus:border-[#1c62b9]"
-                            : "bg-white border-[#ccc] text-[#0f0f0f] focus:border-[#1c62b9]"
-                        }`}
-                      >
-                        <option value={0.25}>0.25x</option>
-                        <option value={0.5}>0.5x</option>
-                        <option value={0.75}>0.75x</option>
-                        <option value={1}>1x</option>
-                        <option value={1.25}>1.25x</option>
-                        <option value={1.5}>1.5x</option>
-                        <option value={1.75}>1.75x</option>
-                        <option value={2}>2x</option>
-                      </select>
+                      <div className="flex items-center gap-2">
+                        <Gauge size={16} className="text-white" />
+                        <select
+                          value={playbackRate}
+                          onChange={(e) =>
+                            setPlaybackRate(Number(e.target.value))
+                          }
+                          className={`border rounded px-2 py-1 text-sm transition-colors duration-300 ${
+                            isDarkMode
+                              ? "bg-[#272727] border-[#404040] text-white focus:border-[#1c62b9]"
+                              : "bg-white border-[#ccc] text-[#0f0f0f] focus:border-[#1c62b9]"
+                          }`}
+                        >
+                          <option value={0.25}>0.25x</option>
+                          <option value={0.5}>0.5x</option>
+                          <option value={0.75}>0.75x</option>
+                          <option value={1}>1x</option>
+                          <option value={1.25}>1.25x</option>
+                          <option value={1.5}>1.5x</option>
+                          <option value={1.75}>1.75x</option>
+                          <option value={2}>2x</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -721,7 +725,7 @@ export default function Home() {
                 }`}
               >
                 <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <Settings size={24} className="text-white" />
+                  <Gauge size={24} className="text-white" />
                 </div>
                 <h3
                   className={`font-semibold mb-2 ${
@@ -931,7 +935,7 @@ export default function Home() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                      <Settings size={16} className="text-white" />
+                      <Gauge size={16} className="text-white" />
                     </div>
                     <span
                       className={`font-medium ${
@@ -961,7 +965,7 @@ export default function Home() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                      <Settings size={16} className="text-white" />
+                      <Gauge size={16} className="text-white" />
                     </div>
                     <span
                       className={`font-medium ${
