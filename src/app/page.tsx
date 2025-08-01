@@ -39,6 +39,7 @@ export default function Home() {
 
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Theme toggle function
   const toggleTheme = () => {
@@ -53,6 +54,23 @@ export default function Home() {
       document.documentElement.classList.remove("dark");
     }
   }, [isDarkMode]);
+
+  // Handle clicking outside search bar to remove focus
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target as Node)
+      ) {
+        searchInputRef.current.blur();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Extract YouTube video ID from URL
   const extractVideoId = (url: string) => {
@@ -246,14 +264,15 @@ export default function Home() {
           <div className="flex-1 max-w-2xl mx-8">
             <div className="flex">
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Paste YouTube URL here..."
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
-                className={`flex-1 px-4 py-2 border-l border-t border-b rounded-l-full transition-colors duration-300 ${
+                className={`flex-1 px-4 py-2 border-l border-t border-b rounded-l-full transition-colors duration-300 focus:outline-none ${
                   isDarkMode
-                    ? "bg-[#121212] border-[#303030] text-white placeholder-[#aaa] focus:border-[#1c62b9]"
-                    : "bg-white border-[#ccc] text-[#0f0f0f] placeholder-[#606060] focus:border-[#1c62b9]"
+                    ? "bg-[#121212] border-[#303030] text-white placeholder-[#aaa]"
+                    : "bg-white border-[#ccc] text-[#0f0f0f] placeholder-[#606060]"
                 }`}
                 onKeyPress={(e) => e.key === "Enter" && handleUrlSubmit()}
               />
