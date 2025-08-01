@@ -39,10 +39,14 @@ export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragType, setDragType] = useState<"start" | "end" | null>(null);
 
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const customTimelineRef = useRef<HTMLDivElement>(null);
 
   // Theme toggle function
   const toggleTheme = () => {
@@ -75,6 +79,31 @@ export default function Home() {
     };
   }, []);
 
+  // Handle custom timeline dragging
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      if (isDragging && dragType) {
+        handleDrag(event as any);
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDragging) {
+        handleDragEnd();
+      }
+    };
+
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, dragType, loopEnd, duration, loopStart]);
+
   // Extract YouTube video ID from URL
   const extractVideoId = (url: string) => {
     const regExp =
@@ -94,7 +123,7 @@ export default function Home() {
     if (id) {
       setVideoId(id);
       setLoopStart(0);
-      setLoopEnd(0);
+      setLoopEnd(30);
       setIsLooping(false);
     } else {
       setModalMessage("Please enter a valid YouTube URL");
@@ -105,6 +134,53 @@ export default function Home() {
   const closeModal = () => {
     setShowModal(false);
     setModalMessage("");
+  };
+
+  const handleCustomTimelineClick = (
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    if (!customTimelineRef.current || !duration) return;
+
+    const rect = customTimelineRef.current.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+    const newTime = percentage * duration;
+
+    // Normal seek behavior
+    if (playerRef.current) {
+      playerRef.current.seekTo(newTime);
+    }
+  };
+
+  const handleDragStart = (event: React.MouseEvent, type: "start" | "end") => {
+    event.stopPropagation();
+    setIsDragging(true);
+    setDragType(type);
+  };
+
+  const handleDrag = (event: React.MouseEvent) => {
+    if (!isDragging || !dragType || !customTimelineRef.current || !duration)
+      return;
+
+    const rect = customTimelineRef.current.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+    const newTime = percentage * duration;
+
+    if (dragType === "start") {
+      setLoopStart(newTime);
+      if (loopEnd <= newTime) {
+        setLoopEnd(Math.min(duration, newTime + 30));
+      }
+    } else {
+      setLoopEnd(newTime);
+    }
+    setIsLooping(true);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    setDragType(null);
   };
 
   const onReady = (event: any) => {
@@ -123,7 +199,7 @@ export default function Home() {
       setCurrentTime(currentTime);
 
       // Handle looping
-      if (isLooping && loopStart > 0 && loopEnd > 0) {
+      if (isLooping && loopEnd > loopStart) {
         if (currentTime >= loopEnd) {
           playerRef.current.seekTo(loopStart);
         }
@@ -346,30 +422,15 @@ export default function Home() {
                         {formatTime(duration)}
                       </span>
                     </div>
-                    <div className="relative h-1 bg-gray-600/50 rounded-full">
+                    <div
+                      ref={progressBarRef}
+                      className="relative h-1 bg-gray-600/50 rounded-full cursor-pointer transition-all"
+                      onClick={handleCustomTimelineClick}
+                    >
                       <div
                         className="absolute h-full bg-red-600 rounded-full transition-all"
                         style={{ width: `${(currentTime / duration) * 100}%` }}
                       />
-                      {isLooping && (
-                        <>
-                          <div
-                            className="absolute h-full bg-red-400/30 rounded-full"
-                            style={{
-                              left: `${(loopStart / duration) * 100}%`,
-                              width: `${((loopEnd - loopStart) / duration) * 100}%`,
-                            }}
-                          />
-                          <div
-                            className="absolute w-1 h-full bg-red-400 rounded-full shadow-lg"
-                            style={{ left: `${(loopStart / duration) * 100}%` }}
-                          />
-                          <div
-                            className="absolute w-1 h-full bg-red-400 rounded-full shadow-lg"
-                            style={{ left: `${(loopEnd / duration) * 100}%` }}
-                          />
-                        </>
-                      )}
                     </div>
                   </div>
 
@@ -464,7 +525,67 @@ export default function Home() {
             </div>
           )}
 
-          {/* Loop Controls Section */}
+          {/* Custom Timeline for Loop Control */}
+          {videoId && (
+            <div className="mt-4 p-4 bg-black/20 rounded-lg">
+              <div className="mb-2 flex justify-between text-sm text-gray-300">
+                <span>Loop Timeline</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+              <div
+                ref={customTimelineRef}
+                className="relative h-8 bg-gray-700/50 rounded-lg cursor-pointer"
+                onClick={handleCustomTimelineClick}
+              >
+                {/* Loop Segment */}
+                {isLooping && (
+                  <div
+                    className="absolute h-full bg-pink-500/60 rounded-lg"
+                    style={{
+                      left: `${(loopStart / duration) * 100}%`,
+                      width: `${((loopEnd - loopStart) / duration) * 100}%`,
+                    }}
+                  />
+                )}
+
+                {/* Current Position */}
+                <div
+                  className="absolute w-0.5 h-full bg-white rounded-full shadow-lg"
+                  style={{ left: `${(currentTime / duration) * 100}%` }}
+                />
+
+                {/* Start Handle */}
+                <div
+                  className={`absolute top-0 w-3 h-full cursor-ew-resize ${
+                    isDragging && dragType === "start" ? "z-20" : "z-10"
+                  }`}
+                  style={{ left: `${(loopStart / duration) * 100}%` }}
+                  onMouseDown={(e) => handleDragStart(e, "start")}
+                >
+                  <div className="w-3 h-3 bg-white rounded-sm shadow-lg transform -translate-x-1/2 translate-y-1/2" />
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-white font-mono">
+                    {formatTime(loopStart)}
+                  </div>
+                </div>
+
+                {/* End Handle */}
+                <div
+                  className={`absolute top-0 w-3 h-full cursor-ew-resize ${
+                    isDragging && dragType === "end" ? "z-20" : "z-10"
+                  }`}
+                  style={{ left: `${(loopEnd / duration) * 100}%` }}
+                  onMouseDown={(e) => handleDragStart(e, "end")}
+                >
+                  <div className="w-3 h-3 bg-white rounded-sm shadow-lg transform -translate-x-1/2 translate-y-1/2" />
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-white font-mono">
+                    {formatTime(loopEnd)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Loop Controls Section - Simplified */}
           {videoId && (
             <div className="mb-8">
               <div
@@ -482,60 +603,34 @@ export default function Home() {
                   Loop Controls
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Loop Points */}
+                <div className="flex items-center gap-4">
                   <div>
                     <h4
                       className={`font-medium mb-3 ${
                         isDarkMode ? "text-gray-200" : "text-[#606060]"
                       }`}
                     >
-                      Loop Points
+                      Loop Status
                     </h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setLoopPoint("start")}
-                          className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-sm font-medium transition-all duration-300 text-white"
-                        >
-                          Set Start ({formatTime(loopStart)})
-                        </button>
-                        <span
-                          className={`text-sm ${
-                            isDarkMode ? "text-gray-400" : "text-[#606060]"
-                          }`}
-                        >
-                          Current: {formatTime(currentTime)}
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setIsLooping(!isLooping)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          isLooping
+                            ? "bg-red-600 hover:bg-red-700 text-white"
+                            : isDarkMode
+                              ? "bg-[#272727] hover:bg-[#404040] text-white"
+                              : "bg-[#f2f2f2] hover:bg-[#e5e5e5] text-[#0f0f0f]"
+                        }`}
+                      >
+                        {isLooping ? "Disable Loop" : "Enable Loop"}
+                      </button>
+                      {isLooping && (
+                        <span className="text-sm text-red-400">
+                          Looping: {formatTime(loopStart)} -{" "}
+                          {formatTime(loopEnd)}
                         </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setLoopPoint("end")}
-                          className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-all duration-300 text-white"
-                        >
-                          Set End ({formatTime(loopEnd)})
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setIsLooping(!isLooping)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                            isLooping
-                              ? "bg-red-600 hover:bg-red-700 text-white"
-                              : isDarkMode
-                                ? "bg-[#272727] hover:bg-[#404040] text-white"
-                                : "bg-[#f2f2f2] hover:bg-[#e5e5e5] text-[#0f0f0f]"
-                          }`}
-                        >
-                          {isLooping ? "Disable Loop" : "Enable Loop"}
-                        </button>
-                        {isLooping && (
-                          <span className="text-sm text-red-400">
-                            Looping: {formatTime(loopStart)} -{" "}
-                            {formatTime(loopEnd)}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
 
