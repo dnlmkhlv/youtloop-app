@@ -52,10 +52,40 @@ export default function Home() {
   const progressBarRef = useRef<HTMLDivElement>(null);
   const customTimelineRef = useRef<HTMLDivElement>(null);
 
+  // Save data to localStorage
+  const saveToLocalStorage = (data: any) => {
+    try {
+      localStorage.setItem("youtloop-data", JSON.stringify(data));
+    } catch (error) {
+      console.log("Error saving data:", error);
+    }
+  };
+
   // Theme toggle function
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  // Load saved data from localStorage on component mount
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem("youtloop-data");
+      if (savedData) {
+        const data = JSON.parse(savedData);
+        if (data.videoUrl) setVideoUrl(data.videoUrl);
+        if (data.videoId) setVideoId(data.videoId);
+        if (data.loopStart !== undefined) setLoopStart(data.loopStart);
+        if (data.loopEnd !== undefined) setLoopEnd(data.loopEnd);
+        if (data.isLooping !== undefined) setIsLooping(data.isLooping);
+        if (data.playbackRate !== undefined) setPlaybackRate(data.playbackRate);
+        if (data.volume !== undefined) setVolume(data.volume);
+        if (data.isMuted !== undefined) setIsMuted(data.isMuted);
+        if (data.isDarkMode !== undefined) setIsDarkMode(data.isDarkMode);
+      }
+    } catch (error) {
+      console.log("Error loading saved data:", error);
+    }
+  }, []);
 
   // Apply theme to document
   useEffect(() => {
@@ -65,6 +95,32 @@ export default function Home() {
       document.documentElement.classList.remove("dark");
     }
   }, [isDarkMode]);
+
+  // Save data when important states change
+  useEffect(() => {
+    const dataToSave = {
+      videoUrl,
+      videoId,
+      loopStart,
+      loopEnd,
+      isLooping,
+      playbackRate,
+      volume,
+      isMuted,
+      isDarkMode,
+    };
+    saveToLocalStorage(dataToSave);
+  }, [
+    videoUrl,
+    videoId,
+    loopStart,
+    loopEnd,
+    isLooping,
+    playbackRate,
+    volume,
+    isMuted,
+    isDarkMode,
+  ]);
 
   // Handle clicking outside search bar to remove focus
   useEffect(() => {
