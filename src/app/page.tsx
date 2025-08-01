@@ -194,6 +194,17 @@ export default function Home() {
   const onStateChange = (event: any) => {
     const state = event.target.getPlayerState();
     setIsPlaying(state === 1);
+
+    // Handle video end state for looping
+    if (state === 0 && isLooping && loopEnd > loopStart) {
+      // Video ended, seek back to loop start
+      setTimeout(() => {
+        if (playerRef.current) {
+          playerRef.current.seekTo(loopStart);
+          playerRef.current.playVideo();
+        }
+      }, 100);
+    }
   };
 
   const onProgress = () => {
@@ -203,7 +214,8 @@ export default function Home() {
 
       // Handle looping
       if (isLooping && loopEnd > loopStart) {
-        if (currentTime >= loopEnd) {
+        // Check if we've reached the loop end or the video end
+        if (currentTime >= loopEnd || currentTime >= duration) {
           playerRef.current.seekTo(loopStart);
         }
       }
