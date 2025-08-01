@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface FooterProps {
   isDarkMode: boolean;
 }
@@ -13,9 +15,11 @@ export default function Footer({ isDarkMode }: FooterProps) {
           {/* Logo and Tagline */}
           <div className="flex flex-col items-center sm:items-start gap-2">
             <div className="flex items-center gap-2">
-              <img
+              <Image
                 src="/youtloop-logo.svg"
                 alt="YoutLoop Logo"
+                width={32}
+                height={32}
                 className="w-8 h-8"
               />
               <span

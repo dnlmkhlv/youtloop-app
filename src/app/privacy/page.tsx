@@ -26,10 +26,10 @@ export default function Privacy() {
                 Introduction
               </h2>
               <p>
-                YoutLoop ("we", "our", or "us") respects your privacy and is
-                committed to protecting your personal data. This privacy policy
-                explains how we handle any personal information when you use our
-                website.
+                YoutLoop (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;)
+                respects your privacy and is committed to protecting your
+                personal data. This privacy policy explains how we handle any
+                personal information when you use our website.
               </p>
             </section>
 
@@ -62,7 +62,7 @@ export default function Privacy() {
                 Third-Party Services
               </h2>
               <p>
-                We use YouTube's API services to provide video playback
+                We use YouTube&apos;s API services to provide video playback
                 functionality. Your interaction with YouTube content is subject
                 to the{" "}
                 <a
@@ -83,7 +83,7 @@ export default function Privacy() {
               </h2>
               <p>
                 All preferences and settings are stored locally in your browser.
-                We don't maintain any servers or databases with user
+                We don&apos;t maintain any servers or databases with user
                 information.
               </p>
             </section>

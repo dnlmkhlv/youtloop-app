@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { YouTubePlayer, YouTubeEvent } from "@/types/youtube";
 
 interface YouTubePlayerState {
   isPlaying: boolean;
@@ -12,9 +13,9 @@ interface YouTubePlayerState {
 }
 
 interface UseYouTubePlayerReturn extends YouTubePlayerState {
-  playerRef: React.RefObject<any>;
-  onReady: (event: any) => void;
-  onStateChange: (event: any) => void;
+  playerRef: React.RefObject<YouTubePlayer | null>;
+  onReady: (event: YouTubeEvent) => void;
+  onStateChange: (event: YouTubeEvent) => void;
   onProgress: () => void;
   setVolume: (volume: number) => void;
   setIsMuted: (muted: boolean) => void;
@@ -30,16 +31,16 @@ export function useYouTubePlayer(): UseYouTubePlayerReturn {
   const [isMuted, setIsMuted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
 
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<YouTubePlayer>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const onReady = (event: any) => {
+  const onReady = (event: YouTubeEvent) => {
     playerRef.current = event.target;
     const videoDuration = event.target.getDuration();
     setDuration(videoDuration);
   };
 
-  const onStateChange = (event: any) => {
+  const onStateChange = (event: YouTubeEvent) => {
     const state = event.target.getPlayerState();
     setIsPlaying(state === 1);
   };

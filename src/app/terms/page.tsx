@@ -26,9 +26,9 @@ export default function Terms() {
                 1. Acceptance of Terms
               </h2>
               <p>
-                By accessing and using YoutLoop ("the Service"), you accept and
-                agree to be bound by the terms and conditions outlined in this
-                agreement.
+                By accessing and using YoutLoop (&quot;the Service&quot;), you
+                accept and agree to be bound by the terms and conditions
+                outlined in this agreement.
               </p>
             </section>
 
@@ -39,7 +39,7 @@ export default function Terms() {
               <p>
                 YoutLoop is a web application that allows users to loop YouTube
                 videos with custom start and end points. The service is provided
-                "as is" and is subject to change without notice.
+                &quot;as is&quot; and is subject to change without notice.
               </p>
             </section>
 
@@ -48,15 +48,15 @@ export default function Terms() {
                 3. YouTube Content
               </h2>
               <p>
-                Our service integrates with YouTube's API services. By using
-                YoutLoop, you also agree to be bound by{" "}
+                Our service integrates with YouTube&apos;s API services. By
+                using YoutLoop, you also agree to be bound by{" "}
                 <a
                   href="https://www.youtube.com/t/terms"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-white underline hover:text-gray-300"
                 >
-                  YouTube's Terms of Service
+                  YouTube&apos;s Terms of Service
                 </a>
                 .
               </p>
@@ -76,7 +76,9 @@ export default function Terms() {
                 <li>
                   Not use the service for any illegal or unauthorized purpose
                 </li>
-                <li>Respect YouTube's terms of service and content policies</li>
+                <li>
+                  Respect YouTube&apos;s terms of service and content policies
+                </li>
               </ul>
             </section>
 
@@ -96,9 +98,10 @@ export default function Terms() {
                 6. Disclaimer of Warranties
               </h2>
               <p>
-                The service is provided on an "as is" and "as available" basis.
-                YoutLoop makes no warranties, expressed or implied, and hereby
-                disclaims all warranties, including without limitation:
+                The service is provided on an &quot;as is&quot; and &quot;as
+                available&quot; basis. YoutLoop makes no warranties, expressed
+                or implied, and hereby disclaims all warranties, including
+                without limitation:
               </p>
               <ul className="list-disc pl-6 mt-2 space-y-2">
                 <li>Merchantability</li>
@@ -125,8 +128,8 @@ export default function Terms() {
               </h2>
               <p>
                 We reserve the right to modify these terms at any time. We will
-                notify users of any changes by updating the "Last updated" date
-                of these terms.
+                notify users of any changes by updating the &quot;Last
+                updated&quot; date of these terms.
               </p>
             </section>
 

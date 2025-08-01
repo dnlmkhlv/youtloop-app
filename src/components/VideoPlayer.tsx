@@ -1,6 +1,7 @@
 "use client";
 
 import YouTube from "react-youtube";
+import { YouTubePlayer, YouTubeEvent } from "@/types/youtube";
 import {
   Play,
   Pause,
@@ -23,11 +24,11 @@ interface VideoPlayerProps {
   playbackRate: number;
   isFullscreen: boolean;
   isDarkMode: boolean;
-  playerRef: React.RefObject<any>;
+  playerRef: React.RefObject<YouTubePlayer | null>;
   videoContainerRef: React.RefObject<HTMLDivElement | null>;
   progressBarRef: React.RefObject<HTMLDivElement | null>;
-  onReady: (event: any) => void;
-  onStateChange: (event: any) => void;
+  onReady: (event: YouTubeEvent) => void;
+  onStateChange: (event: YouTubeEvent) => void;
   handleCustomTimelineClick: (event: React.MouseEvent<HTMLDivElement>) => void;
   toggleFullscreen: () => void;
   setVolume: (volume: number) => void;

@@ -12,6 +12,7 @@ import Modal from "@/components/Modal";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
 import { extractVideoId } from "@/utils/youtube";
+import { YouTubeEvent } from "@/types/youtube";
 
 export default function Home() {
   // YouTube player state
@@ -72,7 +73,7 @@ export default function Home() {
 
   // Handle YouTube player state changes
   const onStateChange = useCallback(
-    (event: any) => {
+    (event: YouTubeEvent) => {
       const state = event.target.getPlayerState();
 
       // If video ended (state === 0) and looping is enabled, restart from loop start
@@ -138,7 +139,7 @@ export default function Home() {
       if (savedVolume !== undefined) setVolume(savedVolume);
       if (savedIsMuted !== undefined) setIsMuted(savedIsMuted);
     }
-  }, [isDataLoaded]); // Only run when isDataLoaded changes
+  }, [isDataLoaded, savedData, setIsMuted, setPlaybackRate, setVolume]); // Include all dependencies
 
   // Apply theme to document
   useEffect(() => {
@@ -402,14 +403,22 @@ export default function Home() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isPlaying, currentTime, duration, isLooping]);
+  }, [
+    isPlaying,
+    currentTime,
+    duration,
+    isLooping,
+    playerRef,
+    playbackRate,
+    setPlaybackRate,
+  ]);
 
   // Apply playback rate
   useEffect(() => {
     if (playerRef.current) {
       playerRef.current.setPlaybackRate(playbackRate);
     }
-  }, [playbackRate]);
+  }, [playbackRate, playerRef]);
 
   // Apply volume
   useEffect(() => {
@@ -421,7 +430,7 @@ export default function Home() {
         playerRef.current.setVolume(volume);
       }
     }
-  }, [volume, isMuted]);
+  }, [volume, isMuted, playerRef]);
 
   // Update loop end when duration becomes available
   useEffect(() => {
@@ -435,10 +444,10 @@ export default function Home() {
     if (!isLooping || !playerRef.current || !duration) return;
 
     const checkAndLoop = () => {
-      const currentTime = playerRef.current.getCurrentTime();
+      const currentTime = playerRef.current?.getCurrentTime() ?? 0;
       if (currentTime >= loopEnd) {
-        playerRef.current.seekTo(loopStart, true);
-        playerRef.current.playVideo();
+        playerRef.current?.seekTo(loopStart, true);
+        playerRef.current?.playVideo();
       }
     };
 
@@ -448,7 +457,7 @@ export default function Home() {
     return () => {
       clearInterval(loopInterval);
     };
-  }, [isLooping, loopStart, loopEnd, duration]);
+  }, [isLooping, loopStart, loopEnd, duration, playerRef]);
 
   const toggleFullscreen = () => {
     if (!videoContainerRef.current) return;
@@ -456,18 +465,24 @@ export default function Home() {
     if (!isFullscreen) {
       if (videoContainerRef.current.requestFullscreen) {
         videoContainerRef.current.requestFullscreen();
-      } else if ((videoContainerRef.current as any).webkitRequestFullscreen) {
-        (videoContainerRef.current as any).webkitRequestFullscreen();
-      } else if ((videoContainerRef.current as any).msRequestFullscreen) {
-        (videoContainerRef.current as any).msRequestFullscreen();
+      } else if ("webkitRequestFullscreen" in videoContainerRef.current) {
+        (
+          videoContainerRef.current as { webkitRequestFullscreen: () => void }
+        ).webkitRequestFullscreen();
+      } else if ("msRequestFullscreen" in videoContainerRef.current) {
+        (
+          videoContainerRef.current as { msRequestFullscreen: () => void }
+        ).msRequestFullscreen();
       }
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        (document as any).webkitExitFullscreen();
-      } else if ((document as any).msExitFullscreen) {
-        (document as any).msExitFullscreen();
+      } else if ("webkitExitFullscreen" in document) {
+        (
+          document as { webkitExitFullscreen: () => void }
+        ).webkitExitFullscreen();
+      } else if ("msExitFullscreen" in document) {
+        (document as { msExitFullscreen: () => void }).msExitFullscreen();
       }
     }
   };

@@ -2,7 +2,7 @@
 
 A modern YouTube video looping application inspired by LoopTube. Loop any YouTube video with precision using AB loop functionality, perfect for learning languages, sports, music, and more.
 
-![YouTLoop Preview](https://youtloop.vercel.app/youtloop-og.png)
+![YoutLoop Preview](https://youtloop.vercel.app/youtloop-og.png)
 
 ## ✨ Features
 

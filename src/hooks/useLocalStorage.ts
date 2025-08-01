@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react";
 
-interface UseLocalStorageOptions {
+interface UseLocalStorageOptions<T> {
   key: string;
-  defaultValue: any;
+  defaultValue: T;
 }
 
 export function useLocalStorage<T>({
   key,
   defaultValue,
-}: UseLocalStorageOptions) {
+}: UseLocalStorageOptions<T>) {
   const [value, setValue] = useState<T>(defaultValue);
   const [isLoaded, setIsLoaded] = useState(false);
 
