@@ -25,7 +25,6 @@ export default function Home() {
     playerRef,
     onReady,
     onStateChange: originalStateChange,
-    onProgress,
     setVolume,
     setIsMuted,
     setPlaybackRate,
